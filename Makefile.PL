@@ -129,37 +129,6 @@ closedir D;
 
 my @prjdirs;
 
-sub dump_command
-{
-    my ( $line, $sub, $command, $ret) = ( 0, shift, shift, '');
-    $ret .= "\t\@\$($command) \\\n" if scalar @_;
-    for ( @_) {
-       my $call = $sub->($_);
-       if (( $line++ % 20) == 19) {
-          $ret .= "\n\t\@\$($command) \\\n";
-       } elsif ( $line <= scalar @_ && $line > 1) {
-          $ret .=  " \\\n";
-       }
-       $ret .=  "\t$call";
-    }
-    $ret .=  "\n";
-}
-
-
-sub find_version
-{
-   my $name = $_[0];
-   open F, $name or die "Cannot open $name:$!\n";
-   my ($ver1, $ver2);
-   while (<F>) {
-      next unless m/\$VERSION[^\.\d]*(\d+)\.(\d+)/;
-      $ver1 = $1, $ver2 = $2, last;
-   }
-   close F;
-   die "Cannot find VERSION string in $name\n" unless defined $ver1;
-   return ( $ver1, $ver2);
-}
-
 if (1) {
    for ( @d) {
       next unless -d $_;
@@ -185,6 +154,8 @@ if (1) {
    push @allrealclean, 'Makefile';
    push @alldirs, qd( "include/generic"), qd( "auto/$PRJ");
    push @alldirs, map {qd "auto/$PRJ/$_"} @prjdirs;
+   push @allman, 'iterm.pl', manname( 'iterm.pl', 1, '');
+   push @allman, 'IPA.pm', manname( 'IPA.pm', 3, '');
    
    my $iterm_dest = qd("$INSTALL_BIN/iterm") . ( $Win32 ? '.bat' : ( $OS2 ? '.cmd' : ''));
 
@@ -232,6 +203,17 @@ EOF
             return "$_[0] " . dirname ( qd( "$INSTALL_LIB/$dsth"));
          }, 'CP', <include/*.h>);
     print MAKE dump_command( sub { "$PRJ.pm $PREFIX" }, 'CP', 1);
+
+    if ( $install_manuals) {
+       my $cmd = "\t\@pod2man --lax --section=\%d \%s " . ( length( $Config{gzip} ) ? 
+           "| $Config{gzip} -c > \%s.gz\n" : 
+           "> \%s\n" );
+       print MAKE "\t\@echo Installing man pages...\n";
+       while ( scalar @allman ) {
+          $allman[1] =~ m/\.(\d+)$/;
+          printf MAKE $cmd, $1, splice( @allman, 0, 2);
+       }
+    }
     print MAKE "\n";
 
     print MAKE <<EOF;

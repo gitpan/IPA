@@ -1,4 +1,4 @@
-# $Id: iterm.pl,v 1.2 2002/06/25 16:01:39 dk Exp $
+# $Id: iterm.pl,v 1.8 2002/11/19 11:43:37 dk Exp $
 
 use strict;
 use Prima qw(Application MsgBox ComboBox ImageViewer ImageDialog);
@@ -9,6 +9,7 @@ my $HOME = defined( $ENV{HOME}) ? $ENV{HOME} : '.';
 my $fdo;
 my $fds;
 my $vec = '';
+my $codecID = 0;
 
 use IPA::Global qw(/./);
 use IPA::Local qw(/./);
@@ -18,7 +19,7 @@ use IPA::Point qw(/./);
 use IPA::Morphology qw(/./);
 
 
-use vars qw($i $j @i @windows);
+use vars qw($i $j @i @windows $last_image);
 
 $i = Prima::Image-> create;
 $j = Prima::Image-> create;
@@ -52,8 +53,12 @@ sub show_error
 
 sub load
 {
-   my $x = Prima::Image-> load( @_);
+   my $x = Prima::Image-> load( @_, loadExtras => 1);
+   my $codec = $codecID = $x-> {extras}-> {codecID};
+   delete $x-> {extras};
+   $x-> {extras}-> {codecID} = $codec;
    if ( $x) {
+      $last_image = $i if $i;
       $i = $x;
    } else {
       show_error( "error loading: $@");
@@ -65,7 +70,8 @@ sub save
    my $img = shift;
    $img = $i unless defined $img;
    show_error('Nothing to save'), return unless defined $img;
-   $img-> save( @_);
+   my @codeco = exists ( $img-> {codecs}-> {codecID} ) ? () : ( 'codecID', $codecID );
+   $img-> save( @_, @codeco);
    show_error("$@") if $@; 
 }
 
@@ -78,6 +84,16 @@ sub quit
 sub zoom
 {
    $w-> Image-> zoom( $_[0]);
+}
+
+sub undo
+{
+   if ( $last_image) {
+      $i = $last_image;
+      $last_image = undef;
+   } else {
+      show_error ( "No undo image" );
+   }
 }
 
 sub window
@@ -97,6 +113,7 @@ sub window
            [ '~Export' , 'Ctrl+Ins' , km::Ctrl | kb::Insert , sub { 
               my $x = $_[0]-> Image-> image; 
               return unless $x;
+              $last_image = $i if $i;
               $i = $x-> dup;
               show;
            }],
@@ -130,6 +147,11 @@ sub dup
    $w-> Image-> image( $i[$w->{id}] = $img-> dup);
 }
 
+sub help
+{
+   $::application-> open_help('iterm');
+}
+
 $w = Prima::Window-> create(
    name => $::application-> name,
    font => { size => 12 },
@@ -141,12 +163,17 @@ $w = Prima::Window-> create(
           $fdo = Prima::ImageOpenDialog-> create unless $fdo;
           my $x = $fdo-> load;
           return unless $x;
+          my $codec = $codecID = $x-> {extras}-> {codecID};
+          delete $x-> {extras};
+          $x-> {extras}-> {codecID} = $codec;
+          $last_image = $i if $i;
           $i = $x;
           show;
       }],
       [ '~Save as' => 'F2' => 'F2' => sub {
           return unless $i;
           $fds = Prima::ImageSaveDialog-> create unless $fds;
+          $i-> {extras}-> { codecID} = $codecID unless exists $i-> {extras}-> { codecID};
           $fds-> save( $i);
       }],
       [],
@@ -172,6 +199,10 @@ sub command
       command('pwd');
       return;
    }
+   if ( $cmd =~ /^my\s+([^\s=]+)/) {
+      eval "use vars '$1'";
+      $cmd =~ s/^my\s+//;
+   }
    my @ret;
    eval "{\@ret = $cmd}; die \$\@ if \$\@;";
    show_error($@), return if $@;
@@ -185,6 +216,7 @@ sub command
          my $w = window();
          $w-> Image-> image( $i[$w->{id}] = $z);
       } else {
+         $last_image = $i if $i;
          $i = $z-> dup;
          $ifound = 1;
       }
@@ -266,11 +298,10 @@ $w-> insert( ImageViewer =>
    growMode => gm::Client,
 );
 
-#eval { do "$HOME/.iterm-startup"; };
 do "$HOME/.iterm-startup";
 Prima::MsgBox::message( $@) if @$ ;
 
-command( 'load "' . $ARGV[0] . '"') if @ARGV;
+command( 'load "' . quotemeta($ARGV[0]) . '"') if @ARGV;
 
 $w-> Input-> select;
 while ($::application) {
@@ -304,7 +335,7 @@ The main window shows the content of the scalar $i, if it is an image.
 If the additional windows are opened, they correspond to images in array @i.
 The array @i is filled automatically, and the index is shown on 
 the additional new window titles. The additional windows are stored in array
-@windows, under same indeces. The main window is stored in scalar $w.
+@windows, under same indexes. The main window is stored in scalar $w.
 
 The input line is used to enter perl code. If the code returns and newly created
 image, it is stored into $i, and the old value of $i is discarded. If the code
@@ -334,7 +365,7 @@ Opens a file save dialog, where the content of $i can be stored on disk.
 
 Creates a new additional window and copies $i into it. The newly created
 image is stored into @i array, and the new window into @windows array.
-The indeces of these are equal and shown on the window's title.
+The indexes of these are equal and shown on the window's title.
 
 =item Export
 
@@ -396,6 +427,14 @@ Opens a new, empty additional window.
 
 See L<Duplicate>
 
+=item undo
+
+Reverts $i to its last value
+
+=item my VARIABLE [ = VALUE ]
+
+Declare lexical VARIABLE and assign VALUE to it.
+
 =back
 
 =head2 Example
@@ -424,7 +463,11 @@ Display the difference
 
    subtract $i, $i[0]
 
-Note: iterm never asks if the changed images are desired to be saved.
+Display the pixel value under the mouse cursor
+
+   $w-> Image-> onMouseMove( sub { my @x = map {int} $w-> Image-> screen2point(@_[2,3] ); show_error("[$x[0],$x[1]] ".$i-> pixel(@x))});
+
+Note: iterm never asks if the changed images are to be saved.
 
 =head1 FILES
 
@@ -436,7 +479,7 @@ Note: iterm never asks if the changed images are desired to be saved.
 
 =item *
 
-L<IPA> - the image irocessing library
+L<IPA> - the image processing library
 
 =item *
 

@@ -1,4 +1,4 @@
-/* $Id: Point.c,v 1.4 2002/06/25 14:45:15 dk Exp $ */
+/* $Id: Point.c,v 1.5 2002/10/11 12:02:26 dk Exp $ */
 
 #include "IPAsupp.h"
 #include "Point.h"
@@ -102,7 +102,8 @@ PImage IPA__Point_combine(HV *profile)
                 croak("%s: image #%d of images array has different size",method,i);
             }
         }
-    }
+    } else 
+       croak("%s: 'images' array is not present", method);
     if (pexist(conversionType)) {
         conversionType=pget_i(conversionType);
         if (conversionType<CONV_FIRST || conversionType>CONV_LAST) {
