@@ -1,0 +1,11 @@
+# $Id: Global.cls,v 1.2 2000/03/03 15:37:25 dk Exp $
+local $PImage => Handle;
+
+package IPA::Global {
+    PImage close_edges(PImage input,HV *profile);
+    PImage fill_holes(PImage input,HV *profile);
+    PImage area_filter(PImage input,HV *profile);
+    SV* identify_contours(PImage input,HV *profile);
+    PImage fft( PImage input, HV * profile); 
+    PImage band_filter( PImage input, HV * profile);
+}
