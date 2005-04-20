@@ -1,4 +1,4 @@
-# $Id: Point.cls,v 1.2 2000/02/18 10:52:07 voland Exp $
+# $Id: Point.cls,v 1.4 2004/04/06 14:48:34 dk Exp $
 local $PImage => Handle;
 
 package IPA::Point {
@@ -9,5 +9,8 @@ package IPA::Point {
     PImage subtract(PImage input1,PImage input2,HV *profile);
     PImage mask( PImage msk, HV *profile);
     PImage average( SV *list);
+    PImage ab( PImage in, double mul, double add);
+    PImage exp( PImage in);
+    PImage log( PImage in);
 }
 

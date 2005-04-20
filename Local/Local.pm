@@ -1,4 +1,4 @@
-# $Id: Local.pm,v 1.2 2002/06/25 14:45:15 dk Exp $
+# $Id: Local.pm,v 1.6 2003/12/23 12:55:24 dk Exp $
 package IPA::Local;
 use strict;
 use IPA;
@@ -24,8 +24,19 @@ $VERSION = '0.01';
                 filter3x3 
                 median 
                 unionFind
+		hysteresis
+                gaussian
+                laplacian
+                gradients
+                canny
+                nms
+                scale
+                ridge
+                convolution
+                zerocross
                );
-%EXPORT_TAGS = (enhancement => [qw(crispening)], edgedetect => [qw(sobel GEF SDEF deriche)]);
+%EXPORT_TAGS = (enhancement => [qw(crispening)], 
+                edgedetect => [qw(sobel GEF SDEF deriche hysteresis canny)]);
 
 bootstrap IPA::Local $VERSION;
 

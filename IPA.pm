@@ -1,16 +1,16 @@
-# $Id: IPA.pm,v 1.10 2002/11/21 11:32:57 dk Exp $
+# $Id: IPA.pm,v 1.14 2005/04/08 10:09:26 dk Exp $
 package IPA;
 use Prima::Classes;
 use strict;
 require Exporter;
 require DynaLoader;
 
-use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
+use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $__import);
 @ISA = qw(Exporter DynaLoader);
 
 sub dl_load_flags { 0x01 };
 
-$VERSION = '1.01';
+$VERSION = '1.02';
 @EXPORT = qw();
 @EXPORT_OK = qw();
 %EXPORT_TAGS = ();
@@ -27,6 +27,20 @@ use constant conversionTruncAbs  => 1;
 use constant conversionTrunc     => 2;
 use constant conversionScale     => 3;
 use constant conversionScaleAbs  => 4;
+
+sub import
+{
+   my $self = shift;
+   my @modules = ( 1 == @_ && lc($_[0]) eq 'all') ? 
+      qw(Point Local Global Geometry Morphology Misc Region) 
+      : @_;
+   for ( @modules) {
+       eval "use IPA::$_ ();";
+       die $@ if $@;
+       Exporter::export_to_level( "IPA::$_", 1, undef, '/./') 
+          if UNIVERSAL::isa("IPA::$_", 'Exporter');
+   }
+}
 
 1;
 
@@ -58,15 +72,22 @@ images and optional parameter hash. Each function has its own
 set of parameters. If error occurs, the functions call C<die>,
 so it is advisable to use C<eval> blocks around the calls.
 
+The modules namespaces can be used directly, e.g. C<use IPA::Local qw(/./)>,
+C<use IPA::Point qw(/./)> etc, with each module defining its own
+set of exportable names. In case when all names are to be exported, it
+is possible to use C<IPA.pm> exporter by using C<use IPA qw(Local Point)>
+syntax, which is equivalent to two separate C<'use'> calls above. Moreover,
+if all modules are to be loaded and namespace exported, special syntax
+C<use IPA 'all'> is available.
+
 A code that produces a binary thresholded image out of a 8-bit 
 grayscale image is exemplified:
 
    use Prima;
-   use IPA;
-   use IPA::Point;
+   use IPA qw(Point);
    my $i = Prima::Image-> load('8-bit-grayscale.gif');
    die "Cannot load:$@\n" if $@;
-   my $binary = IPA::Point::threshold( $i, minvalue => 128);
+   my $binary = threshold( $i, minvalue => 128);
 
 The abbreviations for pixel types are used, derived from
 the C<im::XXX> image type constants, as follows:
@@ -77,10 +98,11 @@ the C<im::XXX> image type constants, as follows:
    im::Float    - float
    im::Double   - double
    im::Complex  - complex float
-   im::DCOmplex - complex double
+   im::DComplex - complex double
 
 Each function returns the newly created image object with the result of the operation,
 unless stated otherwise in L<API>.
+
 
 =head1 API
 
@@ -345,6 +367,16 @@ Performs adaptive thresholding with median filter with window dimensions C<w> an
 Applies a union find algorithm selected by C<method>. The only implemented
 method is average-based region grow ( 'ave' string constant ). Its only
 parameter is C<threshold>, integer value of the balance merger function.
+
+Supported types: Byte
+
+=item hysteresis IMAGE, thresold => [ thr0, thr1], neighborhood => 4 or 8
+
+Perform binary hysteresis thresholding of Byte image with two thresholds,
+thr0 and thr1. A pixel is set to 1, if its value is larger than thr1 or
+if it is larger than thr0 and the pixel is adjacent to already marked pixels.
+
+Default value of neighborhood is 8.
 
 Supported types: Byte
 
@@ -702,13 +734,48 @@ Contains miscellaneous helper routines.
 
 =over
 
-=item split_channels IMAGE, MODE = 'rgb'
+=item split_channels IMAGE, [ MODE = 'rgb' ]
 
 Splits IMAGE onto channels, with the selected MODE, which
-currently is C<'rgb'> only. Returns channels as anonymous
-array of image objects.
+currently can be C<'rgb'> or C<'hsv'> string constants. 
+Returns channels as anonymous array of image objects.
 
-Supported types: RGB
+=over
+
+=item rgb
+
+Supported types: RGB .
+Returns: 3 Byte images .
+
+=item hsv
+
+Supported types: RGB .
+Returns: 3 float images - with hue, saturation, and value .
+Ranges: hue: 0-360, saturation: 0-1, value: 0-1 .
+
+=back
+
+=item combine_channels [IMAGES], [ MODE = 'rgb' ]
+
+Combines list of channel IMAGES into single image, with the selected 
+MODE, which currently can be C<'rgb'> or C<'hsv'> string constants. 
+Returns the combined image.
+
+=over
+
+=item rgb
+
+Supported types: Byte .
+Returns: RGB image . 
+
+=item hsv
+
+Supported types: Float .
+Returns: RGB image .
+Channel ranges: hue: 0-360, saturation: 0-1, value: 0-1
+
+=back
+
 
 =item histogram IMAGE
 

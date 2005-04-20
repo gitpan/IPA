@@ -1,5 +1,10 @@
-# $Id: Local.cls,v 1.1.1.1 2000/01/13 16:46:57 voland Exp $
+# $Id: Local.cls,v 1.5 2003/12/23 12:55:24 dk Exp $
 local $PImage => Handle;
+local @TwoImages
+{
+   PImage magnitude;
+   PImage direction;
+}
 
 package IPA::Local {
    PImage crispening(PImage input);
@@ -10,5 +15,15 @@ package IPA::Local {
    PImage filter3x3(PImage input,HV *profile);
    PImage median(PImage input,HV *profile);
    PImage unionFind(PImage input,HV *profile);
+   PImage hysteresis(PImage input, HV*profile);
+   PImage gaussian( int size, double sigma);
+   PImage laplacian( int size, double sigma);
+   TwoImages gradients(PImage input);
+   PImage canny( PImage input, HV*profile);
+   PImage nms( PImage input, HV*profile);
+   PImage scale( PImage input, HV*profile);
+   PImage ridge( PImage input, HV*profile);
+   PImage convolution( PImage input, PImage kernel);
+   PImage zerocross( PImage input, HV * profile);
 }
 

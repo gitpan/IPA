@@ -1,4 +1,4 @@
-# $Id: iterm.pl,v 1.8 2002/11/19 11:43:37 dk Exp $
+# $Id: iterm.pl,v 1.12 2004/08/18 08:22:21 dk Exp $
 
 use strict;
 use Prima qw(Application MsgBox ComboBox ImageViewer ImageDialog);
@@ -75,6 +75,38 @@ sub save
    show_error("$@") if $@; 
 }
 
+sub invert
+{
+   my $img = shift;
+   $img = $i unless defined $img;
+   show_error('No image'), return unless defined $img;
+   $img-> resample( $i-> rangeLo, $i-> rangeHi, $i-> rangeHi, $i-> rangeLo);
+}
+
+sub stretch
+{
+   my $img = shift;
+   $img = $i unless defined $img;
+   show_error('No image'), return unless defined $img;
+   $img-> resample( $i-> rangeLo, $i-> rangeHi, 0, (1 << ( $img-> type & im::BPP)) - 1);
+}
+
+sub info
+{
+   my $img = shift;
+   $img = $i unless defined $img;
+   show_error('No image'), return unless defined $img;
+   show_error( sprintf("%d x %d, %d bits %s", 
+     $img-> size, 
+     $img-> type & im::BPP,
+      (
+        (($img-> type & im::GrayScale) ? 'gray ' : '') .
+        (($img-> type & im::RealNumber) ? 'float ' : '') .
+        (($img-> type & im::ComplexNumber) ? 'complex ' : '') .
+        (($img-> type & im::TrigComplexNumber) ? 'trig ' : '')
+      )
+   ));
+}
 
 sub quit
 {
@@ -178,7 +210,10 @@ $w = Prima::Window-> create(
       }],
       [],
       ['~Duplicate' => 'Ctrl+D' => '^D' => sub { dup(); } ],
-   ]]],
+   ]],
+   [],
+   ['Help' => \&help ],
+   ],
 );
 
 
@@ -296,6 +331,28 @@ $w-> insert( ImageViewer =>
    name    => 'Image',
    quality => 1,
    growMode => gm::Client,
+   onMouseMove =>  sub { 
+      my ( $self, $btn, $x, $y) = @_;
+      return unless $btn & km::Shift;
+      my @x = map {int} $w-> Image-> screen2point(@_[2,3] ); 
+      my $pix = $i-> pixel(@x);
+      my $t = $i-> type;
+      return if $pix == cl::Invalid;
+      my @p = (( $t & ( im::ComplexNumber | im::TrigComplexNumber)) ? @$pix : $pix);
+      my $fmt;
+      if ( $t & ( im::ComplexNumber | im::TrigComplexNumber)) {
+         $fmt = '%g %g';
+      } elsif ( $t & im::RealNumber) {
+         $fmt = '%g';
+      } elsif ( $t == im::Short || $t == im::Long) {
+         $fmt = '%d';
+      } elsif (( $t & im::BPP) < 24) {
+         $fmt = "%02x";
+      } else {
+         $fmt = "%06x";
+      }
+      show_error( sprintf "[$x[0],$x[1]] $fmt", @p);
+   }
 );
 
 do "$HOME/.iterm-startup";
@@ -342,6 +399,8 @@ image, it is stored into $i, and the old value of $i is discarded. If the code
 returns more than on image, the additional windows opened automatically.
 If the code throws an exception, its first line is shown on the status line,
 and the whole message is printed to stderr.
+
+To see pixel value under mouse cursor, hold the Shift key.
 
 
 =head2 Interactive commands
@@ -403,6 +462,15 @@ Flushes the command history
 
 Loads image FILE into $i and displays the image. FILE must be a quoted string.
 
+=item reverse IMAGE
+
+Reverses image
+
+=item stretch IMAGE
+
+Stretches image data to fit the whole range. For the histogram equalization
+see L<IPA::Point::equalize>
+
 =item save IMAGE, FILE [ options ]
 
 Stores IMAGE object into FILE.
@@ -462,10 +530,6 @@ Erode the new image
 Display the difference
 
    subtract $i, $i[0]
-
-Display the pixel value under the mouse cursor
-
-   $w-> Image-> onMouseMove( sub { my @x = map {int} $w-> Image-> screen2point(@_[2,3] ); show_error("[$x[0],$x[1]] ".$i-> pixel(@x))});
 
 Note: iterm never asks if the changed images are to be saved.
 

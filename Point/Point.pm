@@ -1,4 +1,4 @@
-# $Id: Point.pm,v 1.3 2002/06/25 14:45:15 dk Exp $
+# $Id: Point.pm,v 1.5 2004/04/06 14:48:34 dk Exp $
 package IPA::Point;
 use strict;
 use IPA;
@@ -9,7 +9,7 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 @ISA = qw(Exporter DynaLoader);
 $VERSION = '0.01';
 @EXPORT = qw();
-@EXPORT_OK = qw(combine threshold gamma remap subtract mask equalize);
+@EXPORT_OK = qw(combine threshold gamma remap subtract mask equalize ab log exp);
 %EXPORT_TAGS = ();
 sub dl_load_flags { 0x01 };
 

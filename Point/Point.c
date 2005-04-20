@@ -1,9 +1,10 @@
-/* $Id: Point.c,v 1.5 2002/10/11 12:02:26 dk Exp $ */
+/* $Id: Point.c,v 1.9 2004/04/06 14:48:34 dk Exp $ */
 
 #include "IPAsupp.h"
 #include "Point.h"
 #include "Point.inc"
 #include "PointSupp.h"
+#include <math.h>
 
 static SV **temporary_prf_Sv;
 
@@ -233,48 +234,60 @@ PImage IPA__Point_combine(HV *profile)
     return oimg;
 }
 
+static double 
+imgmax( PImage img)
+{
+   if ( img-> type & imRealNumber) {
+      return 1e37;
+   } else {
+      switch ( img-> type) {
+      case imLong:  return 0x7fffffff;
+      case imShort: return 0x7ffff;
+      default:
+      return (double)(1 << (img->type&imBPP))-1;
+      }
+   }
+}
+
+static double 
+imgmin( PImage img)
+{
+   if ( img-> type & imRealNumber) {
+      return 1e-37;
+   } else {
+      switch ( img-> type) {
+      case imLong:  return -0x7ffffffe;
+      case imShort: return -0x7fffe;
+      default: return 0;
+      }
+   }
+}
+
 PImage IPA__Point_threshold(PImage img,HV *profile)
 {
     const char *method="IPA::Point::threshold";
-    int minvalue,maxvalue=255;
-    unsigned char lookup_table[256];
+    double minvalue=imgmin(img),maxvalue=imgmax(img);
+    Bool preserve = 0;
+    double val0 = 0;
+    double val1 = 255;
+    PImage out;
 
     if ( !img || !kind_of(( Handle) img, CImage))
        croak("%s: not an image passed", method);
 
-    if (img->type!=imByte) {
-        croak("%s: unsupported image type",method);
-    }
-    if (pexist(minvalue)) {
-        minvalue=pget_i(minvalue);
-        if (minvalue<0 || minvalue>256) {
-            croak("%s: incorrect minvalue %d",method,minvalue);
-        }
-    }
-    else {
-        croak("%s: minvalue required",method);
-    }
-    if (pexist(maxvalue)) {
-        maxvalue=pget_i(maxvalue);
-        if (maxvalue<0 || maxvalue>255) {
-            croak("%s: incorrect maxvalue %d",method,minvalue);
-        }
-        if (maxvalue<minvalue && minvalue!=256) {
-            croak("%s: maxvalue(%d) less than minvalue(%d)",method,maxvalue,minvalue);
-        }
-    }
-
-    if (minvalue>0) {
-        memset(lookup_table,0,minvalue);
-    }
-    if (minvalue<256) {
-        memset(lookup_table+minvalue,255,maxvalue-minvalue+1);
-        if (maxvalue<255) {
-            memset(lookup_table+maxvalue+1,0,255-maxvalue);
-        }
-    }
-
-    return color_remap(method,img,lookup_table);
+    if (pexist(minvalue)) minvalue=pget_f(minvalue);
+    if (pexist(maxvalue)) maxvalue=pget_f(maxvalue);
+#undef true
+#undef false
+    if (pexist(true))     val1=pget_f(true);
+    if (pexist(false))    val0=pget_f(false);
+#define true 1
+#define false 0
+    if (pexist(preserve)) preserve=pget_B(preserve);
+   
+    out = create_compatible_image( img, false);
+    PIX_SRC_DST( img, out, *dst = ((*src < minvalue||*src > maxvalue)?val0:(preserve?*src:val1)) );
+    return out;
 }
 
 PImage IPA__Point_gamma(PImage img,HV *profile)
@@ -381,6 +394,8 @@ PImage IPA__Point_subtract(PImage img1,PImage img2,HV *profile)
     if (img2->type!=imByte) {
         croak("%s: unsupported format of second image",method);
     }
+    if ( img1->w != img2->w || img1->h != img2->h)
+       croak("%s: image dimensions mismatch", method);
 
     if (pexist(conversionType)) {
         conversionType=pget_i(conversionType);
@@ -475,29 +490,41 @@ IPA__Point_average( SV *list)
 
 #define DO_COPY( type) \
     { \
-	type *pSrc; \
-	double *pDst; \
-	for ( pSrc = ( type *) img->data, pDst = ( double *) fimg->data; pSrc < ( type *) ( img->data + img->dataSize); pSrc++, pDst++) { \
-	    *pDst = ( double) *pSrc; \
-	} \
+	type *pSrc = ( type *) img->data; \
+	double *pDst = ( double *) fimg->data; \
+        int h = img-> h; \
+        for ( ; h--; (( Byte*) pSrc) += img-> lineSize, (( Byte*) pDst) += fimg-> lineSize) {\
+           register int w = img-> w;\
+           register type *src = pSrc;\
+           register double *dst = pDst;\
+           while ( w--) *(dst++) = ( double)(*(src++));\
+        } \
     }
     
 #define DO_AVERAGE( type) \
     { \
-	type *pSrc; \
-	double *pDst; \
-	for ( pSrc = ( type *) img->data, pDst = ( double *) fimg->data; pSrc < ( type *) ( img->data + img->dataSize); pSrc++, pDst++) { \
-	    *pDst = ( *pDst + ( ( double) *pSrc)); \
-	} \
+	type *pSrc = ( type *) img->data; \
+	double *pDst = ( double *) fimg->data; \
+        int h = img-> h; \
+        for ( ; h--; (( Byte*) pSrc) += img-> lineSize, (( Byte*) pDst) += fimg-> lineSize) {\
+           register int w = img-> w;\
+           register type *src = pSrc;\
+           register double *dst = pDst;\
+           while ( w--) *(dst++) += ( double)(*(src++));\
+        } \
     }
 
 #define DO_COPYBACK( type) \
     { \
-	type *pDst; \
-	double *pSrc; \
-	for ( pDst = ( type *) oimg->data, pSrc = ( double *) fimg->data; pSrc < ( double *) ( fimg->data + fimg->dataSize); pSrc++, pDst++) { \
-	    *pDst = ( type) ( *pSrc / imgCount + .5); \
-	} \
+	double *pSrc = ( double *) fimg->data; \
+	type *pDst = ( type *) oimg->data; \
+        int h = img-> h; \
+        for ( ; h--; (( Byte*) pSrc) += fimg-> lineSize, (( Byte*) pDst) += oimg-> lineSize) {\
+           register int w = img-> w;\
+           register double *src = pSrc;\
+           register type *dst = pDst;\
+           while ( w--) *(dst++) = ( type) ((*(src++)) / imgCount + .5);\
+        } \
     }
 
     for ( i = 0; i < imgCount; i++) {
@@ -573,4 +600,47 @@ IPA__Point_average( SV *list)
 #undef DO_COPYBACK
 
     return oimg;
+}
+
+
+PImage
+IPA__Point_ab( PImage in, double mul, double add)
+{
+   const char *method="IPA::Point::ab";
+   PImage out;
+
+   if ( !in || !kind_of(( Handle) in, CImage))
+      croak("%s: not an image passed", method);
+   
+   out = create_compatible_image( in, false);
+   PIX_SRC_DST( in, out, *dst = *src * mul + add);
+   return out;
+}
+
+PImage
+IPA__Point_exp( PImage in)
+{
+   const char *method="IPA::Point::exp";
+   PImage out;
+   
+   if ( !in || !kind_of(( Handle) in, CImage))
+      croak("%s: not an image passed", method);
+   
+   out = createImage(in->w,in->h,imDouble);
+   PIX_SRC_DST2( in, out, double, *dst = exp(*src));
+   return out;
+}
+
+PImage
+IPA__Point_log( PImage in)
+{
+   const char *method="IPA::Point::log";
+   PImage out;
+   
+   if ( !in || !kind_of(( Handle) in, CImage))
+      croak("%s: not an image passed", method);
+   
+   out = createImage(in->w,in->h,imDouble);
+   PIX_SRC_DST2( in, out, double, *dst = log(*src));
+   return out;
 }
