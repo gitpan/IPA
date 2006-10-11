@@ -1,9 +1,11 @@
-# $Id: Geometry.cls,v 1.2 2000/02/17 13:02:45 tobez Exp $
+# $Id: Geometry.cls,v 1.3 2006/10/07 23:12:36 dk Exp $
 
 local $PImage => Handle;
 
 package IPA::Geometry {
     PImage mirror( PImage input, HV *profile);
+    PImage rotate90( PImage input, Bool clockwise = true);
+    PImage rotate180( PImage input);
     PImage shift_rotate( PImage img, HV *profile);
 }
 

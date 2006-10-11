@@ -1,4 +1,4 @@
-# $Id: IPA.pm,v 1.14 2005/04/08 10:09:26 dk Exp $
+# $Id: IPA.pm,v 1.17 2006/10/11 19:39:18 dk Exp $
 package IPA;
 use Prima::Classes;
 use strict;
@@ -10,7 +10,7 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $__import);
 
 sub dl_load_flags { 0x01 };
 
-$VERSION = '1.02';
+$VERSION = '1.03';
 @EXPORT = qw();
 @EXPORT_OK = qw();
 %EXPORT_TAGS = ();
@@ -726,6 +726,14 @@ by the offset, specified by integer C<size>.
 Supported types: all, except that the horizontal transformation does not
 support 1- and 4- bit images.
 
+=item rotate90 IMAGE [ clockwise = true ]
+
+Rotates image on 90 degrees clockwise or counter-clockwise
+
+=item rotate180 IMAGE
+
+Rotates image on 180 degrees
+
 =back
 
 =head2 IPA::Misc
@@ -758,7 +766,7 @@ Ranges: hue: 0-360, saturation: 0-1, value: 0-1 .
 =item combine_channels [IMAGES], [ MODE = 'rgb' ]
 
 Combines list of channel IMAGES into single image, with the selected 
-MODE, which currently can be C<'rgb'> or C<'hsv'> string constants. 
+MODE, which currently can be C<'rgb'> , C<'hsv'>, C<'alphaNUM'> string constants. 
 Returns the combined image.
 
 =over
@@ -773,6 +781,12 @@ Returns: RGB image .
 Supported types: Float .
 Returns: RGB image .
 Channel ranges: hue: 0-360, saturation: 0-1, value: 0-1
+
+=item alphaNUM
+
+Supported types: RGB, Byte .
+Returns: Same type as input .
+NUM range: 0 - 255 .
 
 =back
 
