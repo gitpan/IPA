@@ -1,10 +1,14 @@
-/* $Id: IPAsupp.h,v 1.6 2004/04/06 14:48:35 dk Exp $ */
+/* $Id: IPAsupp.h,v 1.8 2007/08/21 12:10:29 dk Exp $ */
 
 #ifndef __IPA_H__
 #define __IPA_H__
 
 #include <apricot.h>
 #include <Image.h>
+
+#ifndef dPROFILE
+#define dPROFILE  SV ** temporary_prf_Sv
+#endif
 
 #define createImage(w,h,type)               create_object("Prima::Image","iii","width",(w),"height",(h),"type",(type))
 #define createNamedImage(w,h,type,name)     create_object("Prima::Image","iiis","width",(w),"height",(h),"type",(type),"name",(name))
@@ -35,8 +39,8 @@
 #define CONV_FIRST              CONV_TRUNCABS
 #define CONV_LAST               CONV_SCALEABS
 
-extern int                              AV2intp(SV *,int **);
 extern PImage                           create_compatible_image(PImage,Bool);
+extern PImage_vmt                       CImage;
 
 typedef float Float;
 typedef double Double;

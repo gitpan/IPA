@@ -1,10 +1,8 @@
-/* $Id: Point2.c,v 1.2 2001/08/22 10:16:48 dk Exp $ */
+/* $Id: Point2.c,v 1.3 2007/08/09 13:04:12 dk Exp $ */
 
 #include "IPAsupp.h"
 #include "Point.h"
 #include "PointSupp.h"
-
-static SV **temporary_prf_Sv;
 
 #undef METHOD
 #define METHOD "IPA::Point::mask"
@@ -34,6 +32,7 @@ static PImage constant( int w, int h, int type, I32 vv) {
 }
 
 PImage IPA__Point_mask( PImage mask, HV *profile) {
+   dPROFILE;
    PImage ifMatch = nil;
    PImage ifNoMatch = nil;
    PImage itest = nil;

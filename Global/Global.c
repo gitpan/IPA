@@ -1,4 +1,4 @@
-/* $Id: Global.c,v 1.6 2005/01/28 11:41:34 dk Exp $ */
+/* $Id: Global.c,v 1.8 2007/08/21 12:10:29 dk Exp $ */
 
 #include "IPAsupp.h"
 #include "Global.h"
@@ -6,28 +6,9 @@
 #include "GlobalSupp.h"
 #include "gsclose.h"
 
-PImage_vmt CImage;
-
-static SV **temporary_prf_Sv;
-
-XS( boot_IPA__Global)
-{
-    dXSARGS;
-
-    (void)items;
-
-    XS_VERSION_BOOTCHECK;
-
-    register_IPA__Global_Package();
-
-    CImage = (PImage_vmt)gimme_the_vmt( "Prima::Image");
-
-    ST(0) = &sv_yes;
-    XSRETURN(1);
-}
-
 PImage IPA__Global_close_edges(PImage img,HV *profile)
 {
+    dPROFILE;
     const char *method="IPA::Global::close_edges";
     PImage gradient;
     int maxlen,minedgelen,mingradient;

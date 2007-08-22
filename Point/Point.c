@@ -1,4 +1,4 @@
-/* $Id: Point.c,v 1.10 2006/10/11 19:39:01 dk Exp $ */
+/* $Id: Point.c,v 1.12 2007/08/21 12:10:29 dk Exp $ */
 
 #include "IPAsupp.h"
 #include "Point.h"
@@ -6,31 +6,11 @@
 #include "PointSupp.h"
 #include <math.h>
 
-static SV **temporary_prf_Sv;
-
 #define pix( img, x, y)     ( (img)->type == imByte ? *( (img)->data + (img)->lineSize * (y) + (x)) : ( (img)->type == imShort ? ( ( short*)( (img)->data + (img)->lineSize * (y)))[(x)] : ( ( long*)( (img)->data + (img)->lineSize * (y)))[(x)]));
 
 #ifndef PRIMA_TRUNC_PRESENT
    #define trunc(x)  ((( x) < 0) ? ceil( x) : floor( x))
 #endif
-
-PImage_vmt CImage;
-
-XS( boot_IPA__Point)
-{
-    dXSARGS;
-
-    (void)items;
-
-    XS_VERSION_BOOTCHECK;
-
-    register_IPA__Point_Package();
-
-    CImage = (PImage_vmt)gimme_the_vmt( "Prima::Image");
-
-    ST(0) = &sv_yes;
-    XSRETURN(1);
-}
 
 PImage color_remap(const char *method,PImage img, unsigned char *lookup_table)
 {
@@ -54,6 +34,7 @@ PImage color_remap(const char *method,PImage img, unsigned char *lookup_table)
 
 PImage IPA__Point_combine(HV *profile)
 {
+    dPROFILE;
     const char *method="IPA::Point::combine";
     PImage *img = nil, oimg, bimg;
     int imgnum = 0;
@@ -265,6 +246,7 @@ imgmin( PImage img)
 
 PImage IPA__Point_threshold(PImage img,HV *profile)
 {
+    dPROFILE;
     const char *method="IPA::Point::threshold";
     double minvalue=imgmin(img),maxvalue=imgmax(img);
     Bool preserve = 0;
@@ -292,6 +274,7 @@ PImage IPA__Point_threshold(PImage img,HV *profile)
 
 PImage IPA__Point_gamma(PImage img,HV *profile)
 {
+    dPROFILE;
     const char *method="IPA::Point::gamma";
     double origGamma=1,destGamma=1;
     unsigned char lookup_table[256];
@@ -325,6 +308,7 @@ PImage IPA__Point_gamma(PImage img,HV *profile)
 
 PImage IPA__Point_remap(PImage img,HV *profile)
 {
+    dPROFILE;
     const char *method="IPA::Point::remap";
     unsigned char lookup_table[256];
 
@@ -375,6 +359,7 @@ PImage IPA__Point_remap(PImage img,HV *profile)
 
 PImage IPA__Point_subtract(PImage img1,PImage img2,HV *profile)
 {
+    dPROFILE;
     const char *method="IPA::Point::subtract";
     int ypos,xpos,xbuf;
     long minval=0,maxval=0,range;

@@ -1,4 +1,4 @@
-/* $Id: Morphology.c,v 1.5 2002/06/25 14:45:15 dk Exp $ */
+/* $Id: Morphology.c,v 1.7 2007/08/21 12:10:29 dk Exp $ */
 
 #include "IPAsupp.h"
 #include "Morphology.h"
@@ -6,27 +6,6 @@
 #include "MorphologySupp.h"
 
 #define bwt_pix(x,n)      (((x) ? 1 : 0)<<(n))
-
-
-static SV **temporary_prf_Sv;
-
-PImage_vmt CImage;
-
-XS( boot_IPA__Morphology)
-{
-    dXSARGS;
-
-    (void)items;
-
-    XS_VERSION_BOOTCHECK;
-
-    register_IPA__Morphology_Package();
-
-    CImage = (PImage_vmt)gimme_the_vmt( "Prima::Image");
-
-    ST(0) = &sv_yes;
-    XSRETURN(1);
-}
 
 PImage bw8bpp_transform(const char *method,PImage img, const Byte *transtbl,int expandEdges)
 {
@@ -138,6 +117,7 @@ PImage bw8bpp_transform(const char *method,PImage img, const Byte *transtbl,int 
 
 PImage IPA__Morphology_BWTransform(PImage img,HV *profile)
 {
+    dPROFILE;
     const char *method="IPA::Morphology::BWTransform";
     PImage oimg;
     unsigned char *transtbl = nil;

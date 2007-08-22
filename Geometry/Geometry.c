@@ -1,32 +1,13 @@
-/* $Id: Geometry.c,v 1.6 2006/10/11 19:39:01 dk Exp $ */
+/* $Id: Geometry.c,v 1.9 2007/08/21 12:10:29 dk Exp $ */
 
 #include "IPAsupp.h"
 #include "Geometry.h"
 #include "Geometry.inc"
 #include "GeometrySupp.h"
 
-static SV **temporary_prf_Sv;
-
-PImage_vmt CImage;
-
-XS( boot_IPA__Geometry)
-{
-    dXSARGS;
-
-    (void)items;
-
-    XS_VERSION_BOOTCHECK;
-
-    register_IPA__Geometry_Package();
-
-    CImage = (PImage_vmt)gimme_the_vmt( "Prima::Image");
-
-    ST(0) = &sv_yes;
-    XSRETURN(1);
-}
-
 PImage IPA__Geometry_mirror(PImage img,HV *profile)
 {
+    dPROFILE;
     const char *method="IPA::Geometry::mirror";
     PImage oimg;
     int mType=0;
@@ -208,7 +189,7 @@ PImage IPA__Geometry_rotate90(PImage img, Bool clockwise)
 
 	if ( clockwise) {
 	   	if ( bs == 1) {
-			Byte * dst0 = nimg-> data + nimg-> w - 1;
+			Byte * dst0 = nimg-> data + nimg-> w - ddh - 1;
 			for ( y = 0; y < img-> h; y++) {
 			   	register int x = w;
 			   	register Byte * dst = dst0--;

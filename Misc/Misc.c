@@ -1,27 +1,9 @@
-/* $Id: Misc.c,v 1.5 2002/06/25 14:45:15 dk Exp $ */
+/* $Id: Misc.c,v 1.6 2007/08/21 12:10:29 dk Exp $ */
 
 #include "IPAsupp.h"
 #include "Misc.h"
 #include "Misc.inc"
 #include "MiscSupp.h"
-
-PImage_vmt CImage;
-
-XS( boot_IPA__Misc)
-{
-    dXSARGS;
-    (void)items;
-
-    XS_VERSION_BOOTCHECK;
-
-    register_IPA__Misc_Package();
-
-    CImage = (PImage_vmt)gimme_the_vmt( "Prima::Image");
-
-    ST(0) = &sv_yes;
-    XSRETURN(1);
-}
-
 
 Histogram *
 IPA__Misc_histogram( PImage img)

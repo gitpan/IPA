@@ -1,13 +1,12 @@
-/* $Id: Geometry2.c,v 1.4 2002/06/25 09:03:51 dk Exp $ */
+/* $Id: Geometry2.c,v 1.5 2007/08/09 13:04:12 dk Exp $ */
 
 #include "IPAsupp.h"
 #include "Geometry.h"
 #include "GeometrySupp.h"
 
-static SV **temporary_prf_Sv;
-
 PImage IPA__Geometry_shift_rotate( PImage img, HV *profile)
 {
+   dPROFILE;
    const char *method="IPA::Geometry::shift_rotate";
    PImage oimg;
    int where = 0;

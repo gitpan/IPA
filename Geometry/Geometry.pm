@@ -1,22 +1,64 @@
-# $Id: Geometry.pm,v 1.4 2006/10/07 23:12:36 dk Exp $
+# $Id: Geometry.pm,v 1.7 2007/08/21 13:58:46 dk Exp $
 package IPA::Geometry;
-use IPA;
+
 use strict;
 require Exporter;
-require DynaLoader;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-@ISA = qw(Exporter DynaLoader);
-$VERSION = '0.01';
+@ISA = qw(Exporter);
+$VERSION = '0.02';
 @EXPORT = qw();
 @EXPORT_OK = qw(mirror shift_rotate rotate90 rotate180);
 %EXPORT_TAGS = (one2one => [qw(mirror)]);
-sub dl_load_flags { 0x01 };
 
 use constant vertical => 1;
 use constant horizontal => 2;
 
-bootstrap IPA::Geometry $VERSION;
 
 1;
 
+__DATA__
+
+=pod
+
+=head1 NAME
+
+IPA::Geometry - mapping pixels from one location to another
+
+=head1 API
+
+=over
+
+=item mirror IMAGE [ type ]
+
+Mirrors IMAGE vertically or horizontally, depending on integer C<type>,
+which can be one of the following constants:
+
+   IPA::Geometry::vertical
+   IPA::Geometry::horizontal
+
+Supported types: all
+
+=item shift_rotate IMAGE [ where, size ]
+
+Shifts image in direction C<where>, which is one of the following constants
+
+   IPA::Geometry::vertical
+   IPA::Geometry::horizontal
+
+by the offset, specified by integer C<size>.
+
+Supported types: all, except that the horizontal transformation does not
+support 1- and 4- bit images.
+
+=item rotate90 IMAGE [ clockwise = true ]
+
+Rotates image on 90 degrees clockwise or counter-clockwise
+
+=item rotate180 IMAGE
+
+Rotates image on 180 degrees
+
+=back
+
+=cut
