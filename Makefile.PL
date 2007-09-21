@@ -1,16 +1,30 @@
-# $Id: Makefile.PL,v 1.17 2007/08/21 12:56:55 dk Exp $
+# $Id: Makefile.PL,v 1.21 2007/09/20 09:39:26 dk Exp $
 package MY;
 use ExtUtils::MakeMaker;
 use Config;
 
-my ( $i, $d, $l, $co) = ('','','','');
+my ( $gencls, $i, $d, $l, $co) = ('gencls', '','','','');
+my $severe = grep { $_ eq '--severe' } @ARGV;
+@ARGV      = grep { $_ ne '--severe' } @ARGV;
 eval { 
 	require Prima::Config;
 	$d  = join(' ', map { "-D$_" } @{$Prima::Config::Config{cdefs}});
 	$i  = join(' ', map { "-I$_" } @{$Prima::Config::Config{incpaths}}, qw(include include/generic));
 	$l  = $Prima::Config::Config{libname} if $^O =~ /win32|os2/i;
+	$l  = "-L$Config{installsitearch}/auto/Prima -lPrima" if $^O eq 'cygwin';
 	$co = $Prima::Config::Config{cobjflag};
+	$gencls = $Prima::Config::Config{gencls};
 };
+if ( $@) {
+	warn "** Prima is required for build\n";
+	if ( $severe) {
+		unlink 'Makefile';
+		exit 1;
+	}
+	$prima_failed = 1;
+}
+
+$prima_failed = 1 if @ARGV;
 
 my @files = map {
 	s/\.c$//;
@@ -28,6 +42,20 @@ $_-> {is_class} = 1 for grep { -f $_-> {src} . '.cls' } @files;
 
 my $o = $Config{obj_ext};
 
+sub post_initialize
+{
+	my $self = shift;
+	my $t = $self->SUPER::post_initialize(@_);
+	$t = <<PRE if $prima_failed;
+
+ipa_init_state:
+	$^X Makefile.PL --severe
+	$Config{make}
+
+PRE
+	return $t;
+}
+
 sub postamble
 {
 	my $self = shift;
@@ -39,7 +67,7 @@ sub postamble
 	  	$t .= <<H
 
 include/generic/$n.h: Makefile $c.cls
-\tgencls --inc --h $c.cls include/generic
+\t$gencls --inc --h $c.cls include/generic
 
 $c$o: Makefile $c.c include/IPAsupp.h include/generic/$n.h include/generic/$n.inc
 
