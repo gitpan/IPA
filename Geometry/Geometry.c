@@ -1,4 +1,4 @@
-/* $Id: Geometry.c,v 1.9 2007/08/21 12:10:29 dk Exp $ */
+/* $Id: Geometry.c,v 1.10 2008/04/17 13:28:07 dk Exp $ */
 
 #include "IPAsupp.h"
 #include "Geometry.h"
@@ -92,8 +92,8 @@ PImage IPA__Geometry_mirror(PImage img,HV *profile)
                         break;
                     case imbpp16:
                         {
-                            short *pi,*po;
-                            for (y=0,pi=(short*)img->data,po=(short*)oimg->data; y<img->h; y++,(*((Byte**)&pi))+=img->lineSize,(*((Byte**)&po))+=oimg->lineSize) {
+                            Short *pi,*po;
+                            for (y=0,pi=(Short*)img->data,po=(Short*)oimg->data; y<img->h; y++,(*((Byte**)&pi))+=img->lineSize,(*((Byte**)&po))+=oimg->lineSize) {
                                 for (x=0; x<img->w; x++) {
                                     po[img->w-x-1]=pi[x];
                                 }

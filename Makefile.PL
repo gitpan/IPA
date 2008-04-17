@@ -1,4 +1,4 @@
-# $Id: Makefile.PL,v 1.21 2007/09/20 09:39:26 dk Exp $
+# $Id: Makefile.PL,v 1.23 2007/11/10 18:38:39 dk Exp $
 package MY;
 use ExtUtils::MakeMaker;
 use Config;
@@ -8,10 +8,9 @@ my $severe = grep { $_ eq '--severe' } @ARGV;
 @ARGV      = grep { $_ ne '--severe' } @ARGV;
 eval { 
 	require Prima::Config;
-	$d  = join(' ', map { "-D$_" } @{$Prima::Config::Config{cdefs}});
-	$i  = join(' ', map { "-I$_" } @{$Prima::Config::Config{incpaths}}, qw(include include/generic));
-	$l  = $Prima::Config::Config{libname} if $^O =~ /win32|os2/i;
-	$l  = "-L$Config{installsitearch}/auto/Prima -lPrima" if $^O eq 'cygwin';
+	$d  = $Prima::Config::Config{define};
+	$i  = "$Prima::Config::Config{inc} -Iinclude -Iinclude/generic";
+	$l  = $Prima::Config::Config{libs};
 	$co = $Prima::Config::Config{cobjflag};
 	$gencls = $Prima::Config::Config{gencls};
 };
@@ -107,7 +106,7 @@ WriteMakefile(
 	NAME              => 'IPA',
 	VERSION_FROM      => 'IPA.pm',
 	PREREQ_PM         => {
-		'Prima'		=> 1,
+		'Prima'		=> 1.24,
 	},
 	ABSTRACT_FROM     => 'IPA.pm',
 	AUTHOR            => 'Dmitry Karasik <dmitry@karasik.eu.org>',

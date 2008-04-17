@@ -1,11 +1,14 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         IPA
-version:      1.05
-version_from: IPA.pm
-installdirs:  site
-requires:
-    Prima:                         1
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.30
+--- #YAML:1.0
+name:                IPA
+version:             1.06
+abstract:            Image Processing Algorithms
+license:             ~
+author:              
+    - Dmitry Karasik <dmitry@karasik.eu.org>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Prima:                         1.24
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3
