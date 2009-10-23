@@ -1,4 +1,4 @@
-/* $Id: IPAsupp.h,v 1.8 2007/08/21 12:10:29 dk Exp $ */
+/* $Id: IPAsupp.h,v 1.10 2009/10/14 18:58:18 dk Exp $ */
 
 #ifndef __IPA_H__
 #define __IPA_H__
@@ -29,8 +29,9 @@
 #define COMBINE_SUM             3
 #define COMBINE_SQRT            4
 #define COMBINE_SIGNEDMAXABS    5
+#define COMBINE_MULTIPLY        6
 #define COMBINE_FIRST           COMBINE_MAXABS
-#define COMBINE_LAST            COMBINE_SIGNEDMAXABS
+#define COMBINE_LAST            COMBINE_MULTIPLY
                                         
 #define CONV_TRUNCABS           1
 #define CONV_TRUNC              2
@@ -63,7 +64,7 @@ typedef double Double;
    dst_ls=dls/sizeof(type2);\
    for ( y = 0; y < h; y++, dsrc += sls, ddst += dls, src = (type1*)dsrc, dst =(type2*)ddst){\
       for ( x = 0; x < w; x++, src++, dst++) {\
-         op;\
+         *dst = (type2)(op);\
       }\
    }\
 }

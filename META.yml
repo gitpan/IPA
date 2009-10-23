@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:                IPA
-version:             1.06
+version:             1.07
 abstract:            Image Processing Algorithms
 license:             ~
 author:              

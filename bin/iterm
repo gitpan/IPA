@@ -1,5 +1,5 @@
 #!/usr/bin/perl 
-# $Id: iterm,v 1.13 2007/08/21 13:22:04 dk Exp $
+# $Id: iterm,v 1.14 2009/10/12 09:41:21 dk Exp $
 
 use strict;
 use Prima qw(Application MsgBox ComboBox ImageViewer ImageDialog);
@@ -12,6 +12,7 @@ my $fds;
 my $vec = '';
 my $codecID = 0;
 
+use IPA;
 use IPA::Global qw(/./);
 use IPA::Local qw(/./);
 use IPA::Geometry qw(/./);
@@ -259,7 +260,7 @@ sub command
    }
 
    $i = Prima::Image-> create if !defined $i || !$i-> isa( 'Prima::Image');
-   $j = Prima::Image-> create if !defined $j || !$i-> isa( 'Prima::Image');
+   $j = Prima::Image-> create if !defined $j || !$j-> isa( 'Prima::Image');
    show;
    print "\n" if $cmd =~ /^print/;
 }

@@ -1,4 +1,4 @@
-/* $Id: Point.c,v 1.13 2008/04/17 13:28:07 dk Exp $ */
+/* $Id: Point.c,v 1.15 2009/10/14 18:58:18 dk Exp $ */
 
 #include "IPAsupp.h"
 #include "Point.h"
@@ -113,7 +113,9 @@ PImage IPA__Point_combine(HV *profile)
     */
     for (y=0,bufp=(Long*)bimg->data; y<img[0]->h; y++,(*((Byte**)&bufp))+=bimg->lineSize) {
         for (x=0; x<img[0]->w; x++) {
-            Long absmax = 0, sum=0, val, absval, origmax = 0;
+            Long absmax = 0, 
+	         sum=(combineType == COMBINE_MULTIPLY)?1:0, 
+		 val, absval, origmax = 0;
             for (i=0; i<imgnum; i++) {
                 val = pix( img[i], x, y);
                 absval = abs( val);
@@ -134,6 +136,9 @@ PImage IPA__Point_combine(HV *profile)
                     case COMBINE_SQRT:
                         sum += val * val;
                         break;
+                    case COMBINE_MULTIPLY:
+		        sum *= val;
+			break;
                 }
             }
             switch (combineType) {
@@ -144,9 +149,8 @@ PImage IPA__Point_combine(HV *profile)
                     bufp[x]=absmax;
                     break;
                 case COMBINE_SUMABS:
-                    bufp[x]=sum;
-                    break;
                 case COMBINE_SUM:
+                case COMBINE_MULTIPLY:
                     bufp[x]=sum;
                     break;
                 case COMBINE_SQRT:
@@ -268,7 +272,7 @@ PImage IPA__Point_threshold(PImage img,HV *profile)
     if (pexist(preserve)) preserve=pget_B(preserve);
    
     out = create_compatible_image( img, false);
-    PIX_SRC_DST( img, out, *dst = ((*src < minvalue||*src > maxvalue)?val0:(preserve?*src:val1)) );
+    PIX_SRC_DST( img, out, (*src < minvalue||*src > maxvalue)?val0:(preserve?*src:val1));
     return out;
 }
 
@@ -598,7 +602,7 @@ IPA__Point_ab( PImage in, double mul, double add)
       croak("%s: not an image passed", method);
    
    out = create_compatible_image( in, false);
-   PIX_SRC_DST( in, out, *dst = *src * mul + add);
+   PIX_SRC_DST( in, out, *src * mul + add);
    return out;
 }
 
@@ -626,6 +630,6 @@ IPA__Point_log( PImage in)
       croak("%s: not an image passed", method);
    
    out = createImage(in->w,in->h,imDouble);
-   PIX_SRC_DST2( in, out, double, *dst = log(*src));
+   PIX_SRC_DST2( in, out, double, log(*src));
    return out;
 }
