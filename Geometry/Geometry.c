@@ -1,4 +1,4 @@
-/* $Id: Geometry.c,v 1.10 2008/04/17 13:28:07 dk Exp $ */
+/* $Id$ */
 
 #include "IPAsupp.h"
 #include "Geometry.h"

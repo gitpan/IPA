@@ -1,4 +1,4 @@
-# $Id: Global.pm,v 1.11 2009/10/14 18:58:18 dk Exp $
+# $Id$
 package IPA::Global;
 use strict;
 require Exporter;

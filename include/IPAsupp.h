@@ -1,4 +1,4 @@
-/* $Id: IPAsupp.h,v 1.10 2009/10/14 18:58:18 dk Exp $ */
+/* $Id$ */
 
 #ifndef __IPA_H__
 #define __IPA_H__

@@ -1,4 +1,4 @@
-# $Id: Morphology.pm,v 1.7 2007/08/21 12:56:55 dk Exp $
+# $Id$
 package IPA::Morphology;
 use strict;
 require Exporter;

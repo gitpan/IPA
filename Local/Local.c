@@ -1,4 +1,4 @@
-/* $Id: Local.c,v 1.15 2009/10/14 18:58:18 dk Exp $ */
+/* $Id$ */
 
 #include <stdarg.h>
 #include "IPAsupp.h"

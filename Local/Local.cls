@@ -1,4 +1,4 @@
-# $Id: Local.cls,v 1.5 2003/12/23 12:55:24 dk Exp $
+# $Id$
 local $PImage => Handle;
 local @TwoImages
 {

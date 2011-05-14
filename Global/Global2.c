@@ -1,4 +1,4 @@
-/* $Id: Global2.c,v 1.9 2009/10/13 14:47:51 dk Exp $ */
+/* $Id$ */
 
 #include "IPAsupp.h"
 #include "Global.h"

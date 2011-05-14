@@ -1,4 +1,4 @@
-# $Id: Misc.pm,v 1.8 2007/08/21 13:58:46 dk Exp $
+# $Id$
 package IPA::Misc;
 use strict;
 require Exporter;

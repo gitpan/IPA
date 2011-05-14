@@ -1,4 +1,4 @@
-# $Id: Global.cls,v 1.5 2009/10/13 14:47:51 dk Exp $
+# $Id$
 local $PImage => Handle;
 
 package IPA::Global {

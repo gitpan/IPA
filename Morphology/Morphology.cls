@@ -1,4 +1,4 @@
-# $Id: Morphology.cls,v 1.2 2007/08/21 12:10:29 dk Exp $
+# $Id$
 local $PImage => Handle;
 
 package IPA::Morphology {

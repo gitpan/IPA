@@ -1,4 +1,4 @@
-# $Id: Local.pm,v 1.9 2007/08/21 13:58:46 dk Exp $
+# $Id$
 package IPA::Local;
 
 use strict;

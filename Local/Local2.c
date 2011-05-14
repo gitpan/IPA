@@ -1,4 +1,4 @@
-/* $Id: Local2.c,v 1.7 2009/10/14 18:58:18 dk Exp $ */
+/* $Id$ */
 
 #include <float.h>
 #include "IPAsupp.h"

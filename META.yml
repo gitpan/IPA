@@ -1,14 +1,20 @@
 --- #YAML:1.0
-name:                IPA
-version:             1.07
-abstract:            Image Processing Algorithms
-license:             ~
-author:              
+name:               IPA
+version:            1.08
+abstract:           Image Processing Algorithms
+author:
     - Dmitry Karasik <dmitry@karasik.eu.org>
-generated_by:        ExtUtils::MakeMaker version 6.42
-distribution_type:   module
-requires:     
-    Prima:                         1.24
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Prima:  1.24
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.48
 meta-spec:
-    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
-    version: 1.3
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

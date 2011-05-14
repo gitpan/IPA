@@ -1,4 +1,4 @@
-# $Id: Geometry.cls,v 1.3 2006/10/07 23:12:36 dk Exp $
+# $Id$
 
 local $PImage => Handle;
 

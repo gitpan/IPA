@@ -1,5 +1,5 @@
 #! /usr/bin/perl
-# $Id: 06_morphology.t,v 1.1 2007/08/21 12:12:17 dk Exp $
+# $Id$
 
 use strict;
 use warnings;

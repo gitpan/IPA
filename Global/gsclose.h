@@ -1,4 +1,4 @@
-/* $Id: gsclose.h,v 1.2 2002/06/25 14:45:14 dk Exp $ */
+/* $Id$ */
 
 #ifndef __GSCLOSE_H__
 #define __GSCLOSE_H__

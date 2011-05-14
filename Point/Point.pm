@@ -1,4 +1,4 @@
-# $Id: Point.pm,v 1.8 2007/08/21 12:56:55 dk Exp $
+# $Id$
 package IPA::Point;
 use strict;
 require Exporter;

@@ -1,5 +1,5 @@
 #!/usr/bin/perl 
-# $Id: iterm,v 1.14 2009/10/12 09:41:21 dk Exp $
+# $Id$
 
 use strict;
 use Prima qw(Application MsgBox ComboBox ImageViewer ImageDialog);

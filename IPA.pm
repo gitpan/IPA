@@ -1,4 +1,4 @@
-# $Id: IPA.pm,v 1.24 2009/10/14 18:27:13 dk Exp $
+# $Id$
 package IPA;
 use strict;
 use Prima;
@@ -10,7 +10,7 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS $__import);
 
 sub dl_load_flags { 0x01 };
 
-$VERSION = '1.07';
+$VERSION = '1.08';
 @EXPORT = qw();
 @EXPORT_OK = qw();
 %EXPORT_TAGS = ();

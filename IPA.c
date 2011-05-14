@@ -1,4 +1,4 @@
-/* $Id: IPA.c,v 1.3 2007/08/21 12:10:29 dk Exp $ */
+/* $Id$ */
 
 #include "IPAsupp.h"
 
@@ -27,7 +27,7 @@ XS( boot_IPA)
     register_IPA__Point_Package( );
     register_IPA__Morphology_Package( );
 
-    ST(0) = &sv_yes;
+    ST(0) = &PL_sv_yes;
     XSRETURN(1);
 }
 

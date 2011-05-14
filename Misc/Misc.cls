@@ -1,4 +1,4 @@
-# $Id: Misc.cls,v 1.4 2003/02/20 13:30:54 dk Exp $
+# $Id$
 local $PImage => Handle;
 local @Histogram int[ 256];
 

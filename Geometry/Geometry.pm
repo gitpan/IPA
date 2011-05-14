@@ -1,4 +1,4 @@
-# $Id: Geometry.pm,v 1.7 2007/08/21 13:58:46 dk Exp $
+# $Id$
 package IPA::Geometry;
 
 use strict;

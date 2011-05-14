@@ -1,4 +1,4 @@
-# $Id: Makefile.PL,v 1.23 2007/11/10 18:38:39 dk Exp $
+# $Id$
 package MY;
 use ExtUtils::MakeMaker;
 use Config;

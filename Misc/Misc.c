@@ -1,4 +1,4 @@
-/* $Id: Misc.c,v 1.6 2007/08/21 12:10:29 dk Exp $ */
+/* $Id$ */
 
 #include "IPAsupp.h"
 #include "Misc.h"

@@ -1,4 +1,4 @@
-# $Id: Point.cls,v 1.4 2004/04/06 14:48:34 dk Exp $
+# $Id$
 local $PImage => Handle;
 
 package IPA::Point {

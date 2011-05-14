@@ -1,4 +1,4 @@
-/* $Id: GeometrySupp.h,v 1.2 2000/02/17 13:02:46 tobez Exp $ */
+/* $Id$ */
 
 #ifndef __GEOMETRYSUPP_H__
 #define __GEOMETRYSUPP_H__
